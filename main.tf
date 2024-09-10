@@ -136,7 +136,7 @@ data "aws_route53_zone" "public" {
     name = var.hosted-zone
 }
 
-resource "aws_route53_record" "phonebook-url" {
+resource "aws_route53_record" "app-url" {
     zone_id = data.aws_route53_zone.public.id
     name = "phonebook.${var.hosted-zone}"
     type = "A"

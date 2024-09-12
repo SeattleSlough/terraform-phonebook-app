@@ -59,7 +59,7 @@ resource "aws_launch_template" "app-asg-lt" {
     instance_type = "t2.micro"
     key_name = var.key-name
     vpc_security_group_ids = [aws_security_group.server-sg.id]
-    user_data = base64encode(templatefile(user-data.sh, { user-data-git-token = var.git-token, user-data-git-name = var.git-name }))
+    user_data = base64encode(templatefile("user-data.sh", {user-data-git-token = var.git-token, user-data-git-user = var.git-name }))
     depends_on = [ github_repository_file.dbendpoint ]
     tag_specifications {
       resource_type = "instance"
@@ -99,7 +99,7 @@ resource "aws_autoscaling_group" "app-asg" {
     vpc_zone_identifier = [ aws_alb.app-lb.subnets ]
     launch_template {
       id = aws_alb_target_group.app-lb-tg.id
-      version = aws_alb_target_group.app-lb-tg.latest_version
+      version = "$Latest"
     }
 }
 

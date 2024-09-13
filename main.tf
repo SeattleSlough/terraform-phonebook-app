@@ -41,7 +41,7 @@ data "aws_ami" "al2023" {
 }
 
 resource "aws_alb_target_group" "app-lb-tg" {
-    name = "phonebook-lb-tg"
+    name = "phonebook-app-tg"
     port = 80
     protocol = "HTTP"
     vpc_id = data.aws_vpc.default.id
@@ -53,14 +53,19 @@ resource "aws_alb_target_group" "app-lb-tg" {
   }
 }
 
+variable "lb-tg-name" {
+    type = string
+    default = ""
+}
+
 resource "aws_launch_template" "app-asg-lt" {
-    name = "phonebook-lt"
+    name = "phonebook-app-lt"
     image_id = data.aws_ami.al2023.id
     instance_type = "t2.micro"
     key_name = var.key-name
     vpc_security_group_ids = [aws_security_group.server-sg.id]
     user_data = base64encode(templatefile("user-data.sh", {user-data-git-token = var.git-token, user-data-git-user = var.git-name }))
-    depends_on = [ github_repository_file.dbendpoint ]
+    # depends_on = [ github_repository_file.dbendpoint ]
     tag_specifications {
       resource_type = "instance"
       tags = {
@@ -96,9 +101,9 @@ resource "aws_autoscaling_group" "app-asg" {
     health_check_grace_period = 300
     health_check_type = "ELB"
     target_group_arns = [aws_alb_target_group.app-lb-tg.arn]
-    vpc_zone_identifier = [ aws_alb.app-lb.subnets ]
+    vpc_zone_identifier = aws_alb.app-lb.subnets
     launch_template {
-      id = aws_alb_target_group.app-lb-tg.id
+      id = aws_launch_template.app-asg-lt.id
       version = "$Latest"
     }
 }
@@ -129,6 +134,8 @@ resource "github_repository_file" "dbendpoint" {
     file = "dbserver.endpoint"
     repository = "phonebook-app"
     overwrite_on_create = true
+    commit_author = "Michael Maggs"
+    commit_email = "seattleslew@runawayserver.com"
     branch = "main" #ensure this is the branch you are using
 }
 

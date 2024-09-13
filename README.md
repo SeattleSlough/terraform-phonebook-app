@@ -6,7 +6,7 @@ The structure of the architecture is pretty straight forward. The app is written
 
 The ec2's launch template utilizes a bash script that pulls from the app from a public GitHub repo and launches it.  The launch template is then added to a target group and associated with an ASG.
 
-The MySQL RDS database specifications align with the free tier allowances and only accepts port 3306 traffic initiated from a resource with the ec2's security group.
+The MySQL RDS database specifications align with the free tier allowances and only accepts port 3306 traffic initiated from a resource with the ec2 instance's security group.
 
 The application reaches the database through the creation of a repository file via terraform and that contains the endpoint address which is pulled from the RDS resource block (using the address property vs endpoint to avoid the issues with the 3306 protocol being appended in the latter's data).
 

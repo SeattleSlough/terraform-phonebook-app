@@ -18,6 +18,6 @@ provider "aws" {
 }
 
 provider "github" {
-  owner = "SeattleSlough"
-  # token = ""
+  # owner = ""
+  token = var.git-token
 }

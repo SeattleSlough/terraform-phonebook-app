@@ -1,3 +1,5 @@
+# Iterative Terraform Fhonebook App
+
 This repo contains a basic root module as well as several child modules. It is a WIP as I am taking what we did as a project in my Clarusway DevOps course and am refactoring it. Eventually the child modules will be their own repo and I am just using them here in the root for ease of learning.
 
 The structure of the architecture is pretty straight forward. The app is written in Python with a Flask front end, supported by a MySQL database. The app is deployed across the latest version of two Amazon 2023 Linux ec2 instances sitting in a public subnet and fronted by an ALB that accepts port 80 and 443 traffic.

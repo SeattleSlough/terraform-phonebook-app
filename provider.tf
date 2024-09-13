@@ -19,5 +19,5 @@ provider "aws" {
 
 provider "github" {
   owner = "SeattleSlough"
-  token = "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"
+  # token = ""
 }

@@ -3,7 +3,7 @@ variable "git-name" {
 }
 
 variable "git-token" {
-  default = "xxxxxxxxxxxx"  # only used in the event of a private repo
+  default = ""  # only used in the event of a private repo
 }
 
 variable "key-name" {

@@ -86,7 +86,7 @@ resource "aws_security_group" "alb-sg" {
 }
 
 resource "aws_security_group" "server-sg" {
-  name   = "WebServerSecurityGroup-p"
+  name   = "WebServerSecurityGroup"
   vpc_id = data.aws_vpc.default.id
   tags = {
     Name = "TF_WebServerSecurityGroup"

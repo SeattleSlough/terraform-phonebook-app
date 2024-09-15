@@ -36,27 +36,10 @@ data "aws_ami" "al2023" {
 
     filter {
       name = "name"
-      values = ["al2023-ami-*"]
+      values = ["al2023-ami-2023*"]
     }
 }
 
-resource "aws_alb_target_group" "app-lb-tg" {
-    name = "phonebook-app-tg"
-    port = 80
-    protocol = "HTTP"
-    vpc_id = data.aws_vpc.default.id
-    target_type = "instance"
-
-    health_check {
-        healthy_threshold = 2
-        unhealthy_threshold = 3
-  }
-}
-
-variable "lb-tg-name" {
-    type = string
-    default = ""
-}
 
 resource "aws_launch_template" "app-asg-lt" {
     name = "phonebook-app-lt"
@@ -74,8 +57,22 @@ resource "aws_launch_template" "app-asg-lt" {
     }
 }
 
+resource "aws_alb_target_group" "app-lb-tg" {
+    name = "phonebook-lb-tg"
+    port = 80
+    protocol = "HTTP"
+    vpc_id = data.aws_vpc.default.id
+    target_type = "instance"
+
+    health_check {
+        healthy_threshold = 2
+        unhealthy_threshold = 3
+  }
+}
+
+
 resource "aws_alb" "app-lb" {
-    name = "phoebook-alb"
+    name = "phonebook-alb"
     ip_address_type = "ipv4"
     internal = false
     load_balancer_type = "application"
@@ -95,7 +92,7 @@ resource "aws_alb_listener" "app-lb-listener" {
 
 resource "aws_autoscaling_group" "app-asg" {
     min_size = 1
-    max_size = 2
+    max_size = 3
     desired_capacity = 2
     name = "phonebook-asg"
     health_check_grace_period = 300
@@ -104,7 +101,8 @@ resource "aws_autoscaling_group" "app-asg" {
     vpc_zone_identifier = aws_alb.app-lb.subnets
     launch_template {
       id = aws_launch_template.app-asg-lt.id
-      version = "$Latest"
+      # version = "$Latest"
+      version = aws_launch_template.app-asg-lt.latest_version
     }
 }
 
@@ -129,6 +127,7 @@ resource "aws_db_instance" "app-rds-mysql" {
     identifier = "phonebook-rds-mysql"
 }
 
+
 resource "github_repository_file" "dbendpoint" {
     content = aws_db_instance.app-rds-mysql.address
     file = "dbserver.endpoint"
@@ -138,6 +137,7 @@ resource "github_repository_file" "dbendpoint" {
     commit_email = "seattleslew@runawayserver.com"
     branch = "main" #ensure this is the branch you are using
 }
+
 
 data "aws_route53_zone" "public" {
     name = var.hosted-zone
